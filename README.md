@@ -1,11 +1,11 @@
 #file-server
 
 ##USAGE
-*start server
+* start server
 ```javascript
 node app.js
 ```
-*edit the config.js
+* edit the config.js
 ```javascript
 exports.StaticPath = 'www'; //file path
 exports.Port = 8001;
