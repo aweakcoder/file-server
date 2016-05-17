@@ -1,0 +1,23 @@
+{
+  "name": "file-server",
+  "version": "1.0.0",
+  "description": "simple server for static files",
+  "main": "app.js",
+  "scripts": {
+    "test": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aweakcoder/file-server.git"
+  },
+  "keywords": [
+    "file",
+    "server"
+  ],
+  "author": "aweakcoder",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aweakcoder/file-server/issues"
+  },
+  "homepage": "https://github.com/aweakcoder/file-server#readme"
+}
