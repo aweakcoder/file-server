@@ -1,5 +1,5 @@
 #file-server
-
+* support mimetype browsercache Gzip Deflate Range
 ##USAGE
 * start server
 ```javascript
