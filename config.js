@@ -1,4 +1,4 @@
-exports.StaticPath = 'www';
+exports.StaticPath = '../app';
 exports.Port = 8001;
 exports.Expires = {
     fileMatch: /^(gif|png|jpg|js|css)$/ig,

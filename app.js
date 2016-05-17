@@ -18,6 +18,7 @@ var server = http.createServer(function(request, response) {
     var realPath = path.join(config.StaticPath, path.normalize(pathname.replace(/\.\./g, "")));
 
     var pathHandle = function (realPath) {
+        console.log("request url:", realPath);
         fs.stat(realPath, function (err, stats) {
             if (err) {
                 //404
@@ -35,6 +36,7 @@ var server = http.createServer(function(request, response) {
                     ext = ext ? ext.slice(1) : 'unknown';
                     var contentType = mime[ext] || "text/plain";
                     response.setHeader("Content-Type", contentType);
+                    //启用压缩后 如果设置Content-length，会出问题，比如截断，比如大文件无法显示
                     response.setHeader('Content-Length', stats.size);
 
                     //control browser cache
@@ -58,18 +60,26 @@ var server = http.createServer(function(request, response) {
                                 var stream = raw;
                                 var acceptEncoding = request.headers['accept-encoding'] || "";
                                 var matched = ext.match(config.Compress.match);
-                                if(file_size>config.CompressMinLength){
-                                    //如果小文件压缩的话，会出bug, 直接被截断了
+                                var _file_size = typeof file_size == "undefined" ? 2000 : file_size;
+                                if(_file_size>config.CompressMinLength){
+                                    //如果小文件压缩的话，体积可能变大
                                     if (matched && acceptEncoding.match(/\bgzip\b/)) {
-                                         response.setHeader("Content-Encoding", "gzip");
-                                        stream = raw.pipe(zlib.createGzip());
+                                        //启用压缩后 如果设置Content-length，会出问题，比如截断，比如大文件无法显示
+                                        response.removeHeader("Content-Length");
+                                        response.writeHead(200, { 'content-encoding': 'gzip' });
+                                        raw.pipe(zlib.createGzip()).pipe(response);
                                     } else if (matched && acceptEncoding.match(/\bdeflate\b/)) {
-                                        response.setHeader("Content-Encoding", "deflate");
-                                        stream = raw.pipe(zlib.createDeflate());
+                                        //启用压缩后 如果设置Content-length，会出问题，比如截断，比如大文件无法显示
+                                        response.removeHeader("Content-Length");
+                                        response.writeHead(200, { 'content-encoding': 'deflate' });
+                                        raw.pipe(zlib.createDeflate()).pipe(response);
                                     }
+
+                                }else{
+                                    response.writeHead(statusCode, reasonPhrase);
+                                    raw.pipe(response);
                                 }
-                                response.writeHead(statusCode, reasonPhrase);
-                                stream.pipe(response);
+                                
                             };
 
                         //断点续传
@@ -87,7 +97,7 @@ var server = http.createServer(function(request, response) {
                             }
                         } else {
                             var raw = fs.createReadStream(realPath);
-                            var file_size =  fs.statSync(realPath).size;
+                            var file_size =  stats.size;
                             compressHandle(raw, 200, "Ok", file_size);
                         }
                     }
