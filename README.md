@@ -1,7 +1,26 @@
-#Hello, Ping.
+#file-server
 
-##静态文件服务器部分
-[用Node.js打造你的静态文件服务器](http://cnodejs.org/blog/?p=3904)
+##USAGE
+* start server
+```javascript
+node app.js
+```
+* edit the config.js
+```javascript
+exports.StaticPath = 'www'; //file path
+exports.Port = 8001;
+exports.Expires = {
+    fileMatch: /^(gif|png|jpg|js|css)$/ig,
+    maxAge: 60*60*24*365
+};
 
-##动态文件服务器部分
-[用Node.js构建动态服务器基础](http://cnodejs.org/blog/?p=4520)
+exports.CompressMinLength = 1000; 
+exports.Compress = {
+    match: /css|html|js/ig
+};
+exports.Welcome = {
+    file: "index.html"
+};
+exports.Timeout = 20 * 60 * 1000;
+exports.Secure = null;
+```
