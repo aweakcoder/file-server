@@ -96,9 +96,15 @@ var server = http.createServer(function(request, response) {
                                 response.end();
                             }
                         } else {
+
                             var raw = fs.createReadStream(realPath);
                             var file_size =  stats.size;
-                            compressHandle(raw, 200, "Ok", file_size);
+                            if(config.Compress.match.test(ext)){
+                                compressHandle(raw, 200, "Ok", file_size);
+                            }else{
+                                response.writeHead(200, "Ok");
+                                raw.pipe(response);
+                            }
                         }
                     }
                 }
