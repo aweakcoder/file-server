@@ -1,5 +1,8 @@
-exports.StaticPath = '../app';
-exports.Port = 8001;
+//可以开启多个sever
+exports.servers = [
+    {'port':8001, 'path':'../app'},
+    {'port':8002, 'path':'../src'},
+]
 exports.Expires = {
     fileMatch: /^(gif|png|jpg|js|css)$/ig,
     maxAge: 60*60*24*365

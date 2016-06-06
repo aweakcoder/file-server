@@ -6,16 +6,16 @@ var mime = require("./mime").types;
 var config = require("./config");
 var utils = require("./utils");
 var zlib = require("zlib");
-var PORT = config.Port;
 
-var server = http.createServer(function(request, response) {
+
+function create_callback(request, response, server_path){
     response.setHeader("Server", "Node/V5");
     response.setHeader('Accept-Ranges', 'bytes');
     var pathname = url.parse(request.url).pathname;
     if (pathname.slice(-1) === "/") {
         pathname = pathname + config.Welcome.file;
     }
-    var realPath = path.join(config.StaticPath, path.normalize(pathname.replace(/\.\./g, "")));
+    var realPath = path.join(server_path, path.normalize(pathname.replace(/\.\./g, "")));
 
     var pathHandle = function (realPath) {
         console.log("request url:", realPath);
@@ -113,7 +113,21 @@ var server = http.createServer(function(request, response) {
     };
 
     pathHandle(realPath);
-});
+}
 
-server.listen(PORT);
-console.log("Server running at port: " + PORT + ".");
+//创建多个server
+if(config.servers&&config.servers.length){
+    config.servers.forEach(function(item, index){
+        var server = http.createServer(function(request, response){
+            create_callback(request, response, item.path);
+        });
+        server.listen(item.port);
+        console.log("Server-"+index+" running at port: " + item.port + ". path is: "+item.path);
+    })
+}else{
+    console.log("config servers error");
+}
+
+
+
+
